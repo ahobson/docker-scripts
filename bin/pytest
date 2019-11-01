@@ -1,0 +1,21 @@
+#!/bin/bash
+
+: "${DOCKER_COMPOSE_SERVICE_PYTEST:=python}"
+: "${DOCKER_COMPOSE_FILE_PYTEST:=docker-compose.dev.yml}"
+
+# this might fail
+project_root=$(git rev-parse --show-cdup 2>/dev/null)
+
+if [[ -z "${project_root}" ]]; then
+    project_root=$PWD
+fi
+
+set -euo pipefail
+
+exec /usr/local/bin/docker-compose \
+     -f "${project_root}/${DOCKER_COMPOSE_FILE_PYTEST}" \
+     run \
+     --rm \
+     -w "$PWD" \
+     ${DOCKER_COMPOSE_SERVICE_PYTEST} \
+     pytest "$@"
